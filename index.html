@@ -20,8 +20,10 @@
     }
 
     var app = Elm.Main.init({
-        currentTime: time,
-        snapshot: startingSnapshot
+        flags: {
+            currentTime: time,
+            snapshot: startingSnapshot
+        }
     });
 
     app.ports.saveSnapshot.subscribe(function(snapshot){
