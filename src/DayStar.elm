@@ -1,4 +1,4 @@
-module DayStar exposing (toFloat, fromFloat, max)
+module DayStar exposing (fromFloat, max, toFloat)
 
 import Types exposing (..)
 
@@ -17,7 +17,7 @@ fromFloat float =
         star =
             floor <| (float - Basics.toFloat day) * 2 + 1
     in
-        ( day, star )
+    ( day, star )
 
 
 max : Data -> Float

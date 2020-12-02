@@ -1,18 +1,18 @@
 module View.Plot.Type.AllInOne exposing (allInOne)
 
-import Types exposing (..)
-import Html as H exposing (Html)
-import View.Plot.Series exposing (series)
 import Colors exposing (colorsList)
-import View.Plot.PlotCustomizations exposing (plotCustomizations)
-import View.Plot.Junk.Legend as Junk
+import Html as H exposing (Html)
 import Plot as P
     exposing
-        ( Series
+        ( DataPoint
         , JunkCustomizations
         , PlotSummary
-        , DataPoint
+        , Series
         )
+import Types exposing (..)
+import View.Plot.Junk.Legend as Junk
+import View.Plot.PlotCustomizations exposing (plotCustomizations)
+import View.Plot.Series exposing (series)
 
 
 allInOne : Model -> Data -> List (Html Msg)

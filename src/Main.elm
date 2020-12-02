@@ -1,14 +1,15 @@
 module Main exposing (main)
 
+import Browser
 import Html
-import Update exposing (..)
 import Types exposing (..)
+import Update exposing (..)
 import View exposing (..)
 
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Browser.document
         { init = init
         , update = update
         , view = view

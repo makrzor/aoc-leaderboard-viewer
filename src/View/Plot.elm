@@ -1,17 +1,17 @@
-module View.Plot exposing (plot, toString, fromString)
+module View.Plot exposing (fromString, plot, toString)
 
+import Example
 import Html as H exposing (Html)
+import Http exposing (Error(..))
+import RemoteData exposing (RemoteData(..))
+import Types exposing (..)
 import View.Plot.Type.AllInOne as View
 import View.Plot.Type.OneForEachMember as View
-import Types exposing (..)
-import Example
-import RemoteData exposing (RemoteData(..))
-import Http
 
 
 toString : Plot -> String
-toString plot =
-    case plot of
+toString plot_ =
+    case plot_ of
         OneForEachMember ->
             "OneForEachMember"
 
@@ -41,6 +41,7 @@ plot model =
                     plotView
                         { model | data = Success Example.data }
                         Example.data
+
                 else
                     [ H.text "" ]
 
@@ -74,4 +75,23 @@ viewLoading =
 
 viewFailure : Http.Error -> Html Msg
 viewFailure err =
-    H.text <| "Error: " ++ Basics.toString err
+    H.text <| "Error: " ++ httpErrorToString err
+
+
+httpErrorToString : Http.Error -> String
+httpErrorToString err =
+    case err of
+        Timeout ->
+            "Timeout exceeded"
+
+        NetworkError ->
+            "Network error"
+
+        BadStatus code ->
+            "Bad status: " ++ String.fromInt code
+
+        BadBody e ->
+            "Bad body: " ++ e
+
+        BadUrl url ->
+            "Bad URL: " ++ url

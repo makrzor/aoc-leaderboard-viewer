@@ -1,19 +1,19 @@
 module View.Plot.Type.OneForEachMember exposing (oneForEachMember)
 
-import Types exposing (..)
-import Html as H exposing (Html)
 import Colors exposing (colorsList)
-import View.Date as Date
-import View.Plot.Series exposing (series)
-import View.Plot.PlotCustomizations exposing (plotCustomizations)
-import View.Plot.Junk.Title as Junk
-import View.Member as Member
+import Html as H exposing (Html)
 import Plot as P
     exposing
-        ( Series
-        , JunkCustomizations
+        ( JunkCustomizations
         , PlotSummary
+        , Series
         )
+import Types exposing (..)
+import View.Date as Date
+import View.Member as Member
+import View.Plot.Junk.Title as Junk
+import View.Plot.PlotCustomizations exposing (plotCustomizations)
+import View.Plot.Series exposing (series)
 
 
 oneForEachMember : Model -> Data -> List (Html Msg)

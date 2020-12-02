@@ -1,10 +1,10 @@
 module View.Plot.Junk.Title exposing (title)
 
-import Types exposing (..)
-import Plot as P exposing (JunkCustomizations)
-import View.Plot.Text as Text
 import Day exposing (day)
+import Plot as P exposing (JunkCustomizations)
 import Svg exposing (Svg)
+import Types exposing (..)
+import View.Plot.Text as Text
 
 
 title : String -> Float -> JunkCustomizations Msg

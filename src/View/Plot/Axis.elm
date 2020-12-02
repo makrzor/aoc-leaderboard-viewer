@@ -1,24 +1,23 @@
-module View.Plot.Axis
-    exposing
-        ( horizontalAxis
-        , verticalAxis
-        )
+module View.Plot.Axis exposing
+    ( horizontalAxis
+    , verticalAxis
+    )
 
+import Colors exposing (colors)
 import Day exposing (..)
 import DayStar
-import View.DayStar as DayStar
-import View.Plot.Text as Text
-import View.Date as Date
-import Date
-import Svg.Attributes as SA
-import Colors exposing (colors)
 import Plot as P
     exposing
-        ( Point
-        , Axis
+        ( Axis
         , AxisSummary
         , LabelCustomizations
+        , Point
         )
+import Svg.Attributes as SA
+import Time exposing (Zone)
+import View.Date as Date
+import View.DayStar as DayStar
+import View.Plot.Text as Text
 
 
 horizontalAxis : Maybe Point -> Float -> Axis
@@ -32,14 +31,14 @@ horizontalAxis hover maxDayStar =
         (always (findTicks 1.0 maxDayStar 1.0))
 
 
-verticalAxis : Bool -> Maybe Point -> Float -> Axis
-verticalAxis showOnlyOneOnHover hover maxDate =
+verticalAxis : Zone -> Bool -> Maybe Point -> Float -> Axis
+verticalAxis zone showOnlyOneOnHover hover maxDate =
     axis
         showOnlyOneOnHover
         hover
         ( startOfAoC, maxDate )
         .y
-        (Date.fromTime >> Date.format)
+        (round >> Time.millisToPosix >> Date.format zone)
         (always (findTicks startOfAoC maxDate (2 * day)))
 
 
@@ -60,29 +59,31 @@ axis showOnlyOneOnHover hover ( min, max ) toValue makeString toTicks =
                             |> P.viewLabel Text.attributes
                     }
             in
-                { position = P.closestToZero
-                , axisLine =
-                    Just
-                        { attributes = [ SA.stroke colors.darkGrey ]
-                        , start = min
-                        , end =
-                            ticks
-                                |> List.reverse
-                                |> List.head
-                                |> Maybe.withDefault max
-                        }
-                , ticks =
-                    if showOnlyOneOnHover then
-                        hoveredOrTicks hover toValue P.simpleTick ticks
-                    else
-                        List.map P.simpleTick ticks
-                , labels =
-                    if showOnlyOneOnHover then
-                        hoveredOrTicks hover toValue makeLabel ticks
-                    else
-                        List.map makeLabel ticks
-                , flipAnchor = False
-                }
+            { position = P.closestToZero
+            , axisLine =
+                Just
+                    { attributes = [ SA.stroke colors.darkGrey ]
+                    , start = min
+                    , end =
+                        ticks
+                            |> List.reverse
+                            |> List.head
+                            |> Maybe.withDefault max
+                    }
+            , ticks =
+                if showOnlyOneOnHover then
+                    hoveredOrTicks hover toValue P.simpleTick ticks
+
+                else
+                    List.map P.simpleTick ticks
+            , labels =
+                if showOnlyOneOnHover then
+                    hoveredOrTicks hover toValue makeLabel ticks
+
+                else
+                    List.map makeLabel ticks
+            , flipAnchor = False
+            }
 
 
 hoveredOrTicks : Maybe Point -> (Point -> Float) -> (Float -> a) -> List Float -> List a

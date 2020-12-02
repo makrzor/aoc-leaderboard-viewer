@@ -1,8 +1,9 @@
-module View.Plot.Hint exposing (hint, containerInner)
+module View.Plot.Hint exposing (containerInner, hint)
 
 import Date
 import Html as H exposing (Html)
 import Html.Attributes as HA
+import Time exposing (Posix, Zone)
 import View.Date as Date
 import View.Score as Score
 
@@ -20,13 +21,20 @@ containerInner isLeft hints =
         )
 
 
-hint : Bool -> String -> Float -> Float -> Maybe Int -> Int -> Html msg
-hint striped name solutionDate dayStarFloat maybeScore maxScore =
+hint : Bool -> String -> Zone -> Float -> Float -> Maybe Int -> Int -> Html msg
+hint striped name zone solutionDate dayStarFloat maybeScore maxScore =
+    let
+        solutionDatePosix : Posix
+        solutionDatePosix =
+            solutionDate
+                |> round
+                |> Time.millisToPosix
+    in
     H.div
-        [ HA.class "row"
-        , HA.style (Score.style striped maybeScore maxScore)
-        ]
+        (HA.class "row"
+            :: Score.style striped maybeScore maxScore
+        )
         [ H.div [ HA.class "col-sm col--member" ] [ H.text name ]
-        , H.div [ HA.class "col-sm col--solved" ] [ H.text <| Date.formatWithSeconds <| Date.fromTime <| solutionDate ]
+        , H.div [ HA.class "col-sm col--solved" ] [ H.text <| Date.formatWithSeconds zone solutionDatePosix ]
         , H.div [ HA.class "col-sm col--score" ] [ H.text <| Score.format maybeScore maxScore ]
         ]

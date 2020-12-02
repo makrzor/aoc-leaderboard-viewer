@@ -5,9 +5,9 @@ import List.Extra
 
 startOfAoC : Float
 startOfAoC =
-    -- 2017/12/01, 05:00 GMT
+    -- 2020/12/01, 05:00 GMT
     -- in milliseconds
-    1512104400000
+    1606798800000
 
 
 endOfAoC : Float
@@ -34,25 +34,26 @@ findComfortableRange dataMax current =
         newTime =
             current + day
     in
-        if newTime < dataMax then
-            findComfortableRange dataMax newTime
-        else
-            current
+    if newTime < dataMax then
+        findComfortableRange dataMax newTime
+
+    else
+        current
 
 
 findTicks : Float -> Float -> Float -> List Float
 findTicks min max delta =
-    (List.Extra.iterate
+    List.Extra.iterate
         (\val ->
             let
                 newVal =
                     val + delta
             in
-                if newVal < max then
-                    Just newVal
-                else
-                    Nothing
+            if newVal < max then
+                Just newVal
+
+            else
+                Nothing
         )
         min
-    )
         ++ [ max ]

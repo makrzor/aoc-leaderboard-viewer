@@ -1,9 +1,9 @@
 module Json exposing (dataDecoder)
 
+import Date
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra as JDE
-import Time exposing (Time)
-import Date
+import Time exposing (Posix)
 import Types exposing (..)
 
 
@@ -25,20 +25,33 @@ memberDecoder =
         (JD.field "completion_day_level" completionTimesDecoder)
 
 
-completionTimesDecoder : Decoder (List ( Day, Star, Time ))
+posixDecoder : Decoder Posix
+posixDecoder =
+    JD.string
+        |> JD.andThen
+            (\string ->
+                case String.toInt string of
+                    Nothing ->
+                        JD.fail <| "bad timestamp format: " ++ string
+
+                    Just int ->
+                        JD.succeed <| Time.millisToPosix <| int * 1000
+            )
+
+
+completionTimesDecoder : Decoder (List ( Day, Star, Posix ))
 completionTimesDecoder =
-    JD.keyValuePairs (JD.keyValuePairs (JD.field "get_star_ts" JDE.date))
+    JD.keyValuePairs (JD.keyValuePairs (JD.field "get_star_ts" posixDecoder))
         |> JD.map
             (\days ->
                 days
                     |> List.concatMap
                         (\( day, stars ) ->
                             List.filterMap
-                                (\( star, date ) ->
-                                    Result.map2 (\d s -> ( d, s, date |> Date.toTime ))
+                                (\( star, posix ) ->
+                                    Maybe.map2 (\d s -> ( d, s, posix ))
                                         (String.toInt day)
                                         (String.toInt star)
-                                        |> Result.toMaybe
                                 )
                                 stars
                         )
