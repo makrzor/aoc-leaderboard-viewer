@@ -63,7 +63,7 @@ plotView model data =
     let
         filteredData =
             data
-                |> List.filter (\member -> member.localScore > 0)
+                |> List.filter (\member -> member.stars > 0)
     in
     case model.plot of
         AllInOne ->
