@@ -38,7 +38,7 @@ init { currentTime, snapshot } =
             , hover = Nothing
             , plot = OneForEachMember
             }
-    , Cmd.none
+    , Task.perform CurrentZone Time.here
     )
 
 
