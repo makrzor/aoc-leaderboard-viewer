@@ -60,12 +60,17 @@ plot model =
 
 plotView : Model -> Data -> List (Html Msg)
 plotView model data =
+    let
+        filteredData =
+            data
+                |> List.filter (\member -> member.localScore > 0)
+    in
     case model.plot of
         AllInOne ->
-            View.allInOne model data
+            View.allInOne model filteredData
 
         OneForEachMember ->
-            View.oneForEachMember model data
+            View.oneForEachMember model filteredData
 
 
 viewLoading : Html Msg
