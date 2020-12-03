@@ -1,8 +1,8 @@
 module View.Plot.Text exposing (..)
 
+import Colors exposing (colors)
 import Svg exposing (Attribute)
 import Svg.Attributes as SA
-import Colors exposing (colors)
 
 
 attributes : List (Attribute msg)
@@ -29,11 +29,11 @@ color colorString =
 
 yOffset : Float -> Attribute msg
 yOffset offset =
-    SA.y (toString offset ++ "px")
+    SA.y (String.fromFloat offset ++ "px")
 
 
 styles : List String -> Attribute msg
-styles styles =
-    styles
+styles s =
+    s
         |> String.join ";"
         |> SA.style

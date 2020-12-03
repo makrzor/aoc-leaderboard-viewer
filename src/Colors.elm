@@ -21,10 +21,10 @@ colorsList count =
         repeats =
             ceiling (toFloat count / toFloat (List.length seriesColors))
     in
-        seriesColors
-            |> List.repeat repeats
-            |> List.concat
-            |> List.take count
+    seriesColors
+        |> List.repeat repeats
+        |> List.concat
+        |> List.take count
 
 
 colors :

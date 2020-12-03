@@ -1,14 +1,14 @@
 module View.Plot.Grid exposing (date, dayStar)
 
 import Colors exposing (colors)
-import Day exposing (startOfAoC, day)
-import Svg.Attributes as SA
+import Day exposing (day, startOfAoC)
 import Plot as P
     exposing
         ( Grid
         , GridLineCustomizations
         , Point
         )
+import Svg.Attributes as SA
 
 
 dayStar : Maybe Point -> Float -> Grid
@@ -67,6 +67,7 @@ gridLineX hover tick =
         [ SA.stroke <|
             if isHovering tick hover then
                 colors.darkGrey
+
             else
                 colors.grey
         ]

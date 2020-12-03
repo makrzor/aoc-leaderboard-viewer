@@ -1,9 +1,8 @@
-module View.DayStar
-    exposing
-        ( label
-        , hintLabel
-        , format
-        )
+module View.DayStar exposing
+    ( format
+    , hintLabel
+    , label
+    )
 
 import DayStar
 import Plot as P
@@ -29,10 +28,10 @@ label position =
 hintLabel : Maybe Point -> (Point -> Float) -> List LabelCustomizations
 hintLabel hover toValue =
     hover
-        |> Maybe.map (\point -> [ label (toValue (point)) ])
+        |> Maybe.map (\point -> [ label (toValue point) ])
         |> Maybe.withDefault []
 
 
 format : ( Day, Star ) -> String
 format ( day, star ) =
-    toString day ++ "-" ++ toString star
+    String.fromInt day ++ "-" ++ String.fromInt star

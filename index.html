@@ -19,9 +19,11 @@
         startingSnapshot.plot = 'AllInOne';
     }
 
-    var app = Elm.Main.fullscreen({
-        currentTime: time,
-        snapshot: startingSnapshot
+    var app = Elm.Main.init({
+        flags: {
+            currentTime: time,
+            snapshot: startingSnapshot
+        }
     });
 
     app.ports.saveSnapshot.subscribe(function(snapshot){

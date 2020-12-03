@@ -2,11 +2,11 @@ module Types exposing (..)
 
 import Plot
     exposing
-        ( Point
-        , DataPoint
+        ( DataPoint
+        , Point
         )
 import RemoteData exposing (WebData)
-import Time exposing (Time)
+import Time exposing (Posix, Zone)
 
 
 type alias Snapshot =
@@ -17,7 +17,7 @@ type alias Snapshot =
 
 
 type alias Flags =
-    { currentTime : Time
+    { currentTime : Int
     , snapshot : Maybe Snapshot
     }
 
@@ -26,9 +26,10 @@ type alias Model =
     { url : String
     , cookie : String
     , data : WebData Data
-    , timeOfFetch : Time
+    , timeOfFetch : Posix
     , hover : Maybe Point
     , plot : Plot
+    , zone : Zone
     }
 
 
@@ -37,7 +38,8 @@ type Msg
     | SetCookie String
     | Fetch String String
     | FetchResult (WebData Data)
-    | CurrentTime Time
+    | CurrentTime Posix
+    | CurrentZone Zone
     | Hover (Maybe Point)
     | ShowPlot Plot
 
@@ -57,7 +59,7 @@ type alias Member =
 
 
 type alias CompletionTime =
-    ( Day, Star, Time )
+    ( Day, Star, Posix )
 
 
 type alias Day =

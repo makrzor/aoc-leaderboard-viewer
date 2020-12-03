@@ -1,12 +1,12 @@
-port module Update exposing (init, update, subscriptions)
+port module Update exposing (init, subscriptions, update)
 
 import Http
 import Json exposing (dataDecoder)
 import RemoteData exposing (RemoteData(..))
-import View.Plot as Plot
 import Task
 import Time
 import Types exposing (..)
+import View.Plot as Plot
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -18,13 +18,14 @@ init { currentTime, snapshot } =
                     |> Plot.fromString
                     |> Result.toMaybe
                     |> Maybe.map
-                        (\plot ->
+                        (\plot_ ->
                             { url = url
                             , cookie = cookie
                             , data = NotAsked
-                            , timeOfFetch = currentTime
+                            , timeOfFetch = Time.millisToPosix currentTime
+                            , zone = Time.utc
                             , hover = Nothing
-                            , plot = plot
+                            , plot = plot_
                             }
                         )
             )
@@ -32,11 +33,12 @@ init { currentTime, snapshot } =
             { url = ""
             , cookie = ""
             , data = NotAsked
-            , timeOfFetch = currentTime
+            , timeOfFetch = Time.millisToPosix currentTime
+            , zone = Time.utc
             , hover = Nothing
             , plot = OneForEachMember
             }
-    , Cmd.none
+    , Task.perform CurrentZone Time.here
     )
 
 
@@ -51,26 +53,26 @@ update msg model =
                 newModel =
                     { model | url = url }
             in
-                ( newModel
-                , saveSnapshot
-                    { url = url
-                    , cookie = model.cookie
-                    , plot = Plot.toString model.plot
-                    }
-                )
+            ( newModel
+            , saveSnapshot
+                { url = url
+                , cookie = model.cookie
+                , plot = Plot.toString model.plot
+                }
+            )
 
         SetCookie cookie ->
             let
                 newModel =
                     { model | cookie = cookie }
             in
-                ( newModel
-                , saveSnapshot
-                    { url = model.url
-                    , cookie = cookie
-                    , plot = Plot.toString model.plot
-                    }
-                )
+            ( newModel
+            , saveSnapshot
+                { url = model.url
+                , cookie = cookie
+                , plot = Plot.toString model.plot
+                }
+            )
 
         Fetch url cookie ->
             ( { model | data = Loading }
@@ -90,6 +92,11 @@ update msg model =
             , Cmd.none
             )
 
+        CurrentZone zone ->
+            ( { model | zone = zone }
+            , Cmd.none
+            )
+
         Hover hover ->
             ( { model | hover = hover }
             , Cmd.none
@@ -100,13 +107,13 @@ update msg model =
                 newModel =
                     { model | plot = plot }
             in
-                ( newModel
-                , saveSnapshot
-                    { url = model.url
-                    , cookie = model.cookie
-                    , plot = Plot.toString plot
-                    }
-                )
+            ( newModel
+            , saveSnapshot
+                { url = model.url
+                , cookie = model.cookie
+                , plot = Plot.toString plot
+                }
+            )
 
 
 getCurrentTime : Cmd Msg
@@ -117,9 +124,10 @@ getCurrentTime =
 
 getData : String -> String -> Cmd Msg
 getData url cookie =
-    Http.get (proxyUrl url cookie) dataDecoder
-        |> RemoteData.sendRequest
-        |> Cmd.map FetchResult
+    Http.get
+        { url = proxyUrl url cookie
+        , expect = Http.expectJson (RemoteData.fromResult >> FetchResult) dataDecoder
+        }
 
 
 proxyUrl : String -> String -> String

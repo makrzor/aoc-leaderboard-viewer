@@ -1,31 +1,33 @@
 module View.Plot.Series exposing (series)
 
-import Types exposing (..)
-import Svg.Attributes as SA
 import DayStar
-import Score exposing (score, maxScore)
-import View.Plot.Axis exposing (verticalAxis)
-import View.Date as Date
-import View.Plot.Dot exposing (dot)
-import View.Name as View
 import Plot as P
     exposing
-        ( Series
-        , DataPoint
-        , Point
+        ( DataPoint
         , Interpolation(..)
+        , Point
+        , Series
         )
+import Score exposing (maxScore, score)
+import Svg.Attributes as SA
+import Time exposing (Posix, Zone)
+import Types exposing (..)
+import View.Date as Date
+import View.Name as View
+import View.Plot.Axis exposing (verticalAxis)
+import View.Plot.Dot exposing (dot)
 
 
 series : Model -> Data -> DotOptions -> Bool -> String -> Member -> Series Data Msg
 series model data dotOptions hasAxis color member =
     { axis =
         if hasAxis then
-            verticalAxis dotOptions.yTick model.hover (Date.max data)
+            verticalAxis model.zone dotOptions.yTick model.hover (Date.max data)
+
         else
             P.sometimesYouDoNotHaveAnAxis
     , interpolation = interpolation color
-    , toDataPoints = dataPoints model.hover color member dotOptions
+    , toDataPoints = dataPoints model.zone model.hover color member dotOptions
     }
 
 
@@ -35,42 +37,45 @@ interpolation color =
 
 
 dataPoints :
-    Maybe Point
+    Zone
+    -> Maybe Point
     -> String
     -> Member
     -> DotOptions
     -> Data
     -> List (DataPoint Msg)
-dataPoints hover color member dotOptions data =
+dataPoints zone hover color member dotOptions data =
     member.completionTimes
-        |> List.map (toDataPoint hover color member data dotOptions)
+        |> List.map (toDataPoint zone hover color member data dotOptions)
 
 
 toDataPoint :
-    Maybe Point
+    Zone
+    -> Maybe Point
     -> String
     -> Member
     -> Data
     -> DotOptions
     -> CompletionTime
     -> DataPoint Msg
-toDataPoint hover color member data dotOptions (( day, star, time ) as completionTime) =
+toDataPoint zone hover color member data dotOptions (( day, star, time ) as completionTime) =
     let
         name =
             View.name member
     in
-        dot
-            dotOptions
-            hover
-            name
-            color
-            (toXY completionTime)
-            (score data ( day, star ) name)
-            (maxScore data)
+    dot
+        zone
+        dotOptions
+        hover
+        name
+        color
+        (toXY completionTime)
+        (score data ( day, star ) name)
+        (maxScore data)
 
 
 toXY : CompletionTime -> ( Float, Float )
 toXY ( day, star, time ) =
     ( DayStar.toFloat day star
-    , time
+    , toFloat <| Time.posixToMillis time
     )

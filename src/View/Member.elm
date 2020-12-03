@@ -1,12 +1,12 @@
 module View.Member exposing (description)
 
-import View.Name as View
 import Types exposing (..)
+import View.Name as View
 
 
 description : Member -> String
 description member =
     View.name member
-        ++ (" (stars: " ++ toString member.stars)
-        ++ (", local score: " ++ toString member.localScore)
+        ++ (" (stars: " ++ String.fromInt member.stars)
+        ++ (", local score: " ++ String.fromInt member.localScore)
         ++ ")"

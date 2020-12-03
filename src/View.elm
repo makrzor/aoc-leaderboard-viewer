@@ -1,28 +1,32 @@
 module View exposing (view)
 
+import Browser
+import Date
+import Example
 import Html as H exposing (Html)
 import Html.Attributes as HA
 import Html.Events as HE
-import View.Plot exposing (plot)
-import Types exposing (..)
 import RemoteData exposing (RemoteData(..))
-import Example
-import Date
-import Date.Extra
+import Types exposing (..)
+import View.Plot exposing (plot)
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    H.div [ HA.class "container" ]
-        [ H.div []
-            [ heading
-            , form model
-            ]
-        , H.div []
-            [ exampleWarning model
-            , plot model
+    { title = "AoC Leaderboard Viewer"
+    , body =
+        [ H.div [ HA.class "container" ]
+            [ H.div []
+                [ heading
+                , form model
+                ]
+            , H.div []
+                [ exampleWarning model
+                , plot model
+                ]
             ]
         ]
+    }
 
 
 exampleWarningText : String
@@ -39,6 +43,7 @@ exampleWarning model =
             , HA.attribute "role" "alert"
             ]
             [ H.text exampleWarningText ]
+
     else
         H.text ""
 
@@ -49,23 +54,23 @@ plotButton plot currentlySelectedPlot =
         isActive =
             plot == currentlySelectedPlot
     in
-        H.label
-            [ HA.classList
-                [ ( "btn", True )
-                , ( "btn-secondary", True )
-                , ( "active", isActive )
-                ]
+    H.label
+        [ HA.classList
+            [ ( "btn", True )
+            , ( "btn-secondary", True )
+            , ( "active", isActive )
             ]
-            [ H.input
-                [ HA.type_ "radio"
-                , HA.name "plot-type"
-                , HA.attribute "autocomplete" "off"
-                , HA.checked isActive
-                , HE.onClick (ShowPlot plot)
-                ]
-                []
-            , H.text (plotLabel plot)
+        ]
+        [ H.input
+            [ HA.type_ "radio"
+            , HA.name "plot-type"
+            , HA.attribute "autocomplete" "off"
+            , HA.checked isActive
+            , HE.onClick (ShowPlot plot)
             ]
+            []
+        , H.text (plotLabel plot)
+        ]
 
 
 plotLabel : Plot -> String
@@ -158,10 +163,11 @@ fetchButton model =
                                 [ H.text <|
                                     "Last fetch at "
                                         ++ (model.timeOfFetch
-                                                |> Date.fromTime
-                                                |> Date.Extra.toFormattedString "yyyy/MM/dd', 'HH:mm:ss"
+                                                |> Date.fromPosix model.zone
+                                                |> Date.format "yyyy/MM/dd', 'HH:mm:ss"
                                            )
                                 ]
+
                         else
                             H.text ""
 
